@@ -1,0 +1,21 @@
+문제: 아이템의 희귀도가 'RARE'인 아이템들의 모든 다음 업그레이드 아이템의 아이템 ID(ITEM_ID), 아이템 명(ITEM_NAME), 아이템의 희귀도(RARITY)를 출력하는 SQL 문을 작성해 주세요. 
+  이때 결과는 아이템 ID를 기준으로 내림차순 정렬주세요.
+
+# 방법 1. 테이블 3개 JOIN 사용
+SELECT C.ITEM_ID , C.ITEM_NAME, C.RARITY
+FROM (SELECT ITEM_ID, ITEM_NAME, RARITY
+     FROM ITEM_INFO
+     WHERE RARITY = 'RARE') A join ITEM_TREE B
+ON   A.ITEM_ID = B.PARENT_ITEM_ID 
+JOIN ITEM_INFO C
+ON B.ITEM_ID  = C.ITEM_ID
+ORDER BY ITEM_ID DESC
+
+# 방법 2. IN 서브쿼리 사용
+SELECT ITEM_ID, ITEM_NAME, RARITY
+FROM ITEM_INFO
+WHERE ITEM_ID IN (SELECT B.ITEM_ID
+                 FROM ITEM_INFO A JOIN ITEM_TREE B
+                 ON A.ITEM_ID = B.PARENT_ITEM_ID 
+                 WHERE A.RARITY = 'RARE')
+ORDER BY ITEM_ID DESC
