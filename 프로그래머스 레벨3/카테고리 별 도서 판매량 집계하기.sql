@@ -1,0 +1,40 @@
+문제: 2022년 1월의 카테고리 별 도서 판매량을 합산하고, 카테고리(CATEGORY), 총 판매량(TOTAL_SALES) 리스트를 출력하는 SQL문을 작성해주세요.
+결과는 카테고리명을 기준으로 오름차순 정렬해주세요.
+
+
+# 방법 1. OIN + DATE_FORMAT 조건 활용
+
+SELECT A.CATEGORY, SUM(B.SALES) AS TOTAL_SALES
+
+FROM BOOK A JOIN 
+(SELECT *
+FROM BOOK_SALES
+WHERE DATE_FORMAT(SALES_DATE, '%Y-%m') = '2022-01') B
+
+ON A.BOOK_ID = B.BOOK_ID
+
+GROUP BY A.CATEGORY
+
+ORDER BY A.CATEGORY
+
+# 방법 2. CTE (WITH 구문) + 날짜 범위 (BETWEEN) 활용
+WITH JAN_SALES AS (
+    SELECT 
+        BOOK_ID,
+        SALES
+    FROM 
+        BOOK_SALES
+    WHERE 
+        SALES_DATE BETWEEN '2022-01-01' AND '2022-01-31'
+)
+SELECT 
+    B.CATEGORY,
+    SUM(S.SALES) AS TOTAL_SALES
+FROM 
+    JAN_SALES S
+JOIN 
+    BOOK B ON S.BOOK_ID = B.BOOK_ID
+GROUP BY 
+    B.CATEGORY
+ORDER BY 
+    B.CATEGORY ASC;
